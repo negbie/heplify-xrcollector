@@ -33,7 +33,7 @@ func init() {
 }
 
 func main() {
-	UDPAddr, err := net.ResolveUDPAddr("udp", hepServerAddress)
+	UDPAddr, err := net.ResolveUDPAddr("udp", collectorAddress)
 	if err != nil {
 		log.Fatalln(err)
 	}
