@@ -29,7 +29,7 @@ func TestMain(t *testing.T) {
 		log.Fatalln(err)
 	}
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 10; i++ {
 		_, err := connXROut.Write(publish)
 		if err != nil {
 			log.Fatalln(err)

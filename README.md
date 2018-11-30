@@ -14,10 +14,10 @@ Download [heplify-xrcollector](https://github.com/negbie/heplify-xrcollector/rel
 
 ### Examples
 ```bash
-# Listen on 0.0.0.0:9064 for RTCP-XR and send it as HEP to 127.0.0.1:9060
+# Listen on 0.0.0.0:9064 for vq-rtcpxr and send it as HEP to 127.0.0.1:9060
 ./heplify-xrcollector
 
-# Listen on 0.0.0.0:9066 for RTCP-XR and send it as HEP to 192.168.1.10:9060
+# Listen on 0.0.0.0:9066 for vq-rtcpxr and send it as HEP to 192.168.1.10:9060
 ./heplify-xrcollector -xs :9066 -hs 192.168.1.10:9060
 
 ```

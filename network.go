@@ -54,7 +54,7 @@ func processPublish(pkt []byte) ([]byte, error) {
 		return nil, sip.Error
 	}
 	if sip.ContentType != "application/vq-rtcpxr" || len(sip.Body) < 32 {
-		return nil, fmt.Errorf("No vq-rtcpxr inside SIP Publish:\n%s", sip.Msg)
+		return nil, fmt.Errorf("No vq-rtcpxr inside SIP PUBLISH:\n%s", sip.Msg)
 	}
 
 	resp := fmt.Sprintf("SIP/2.0 200 OK\r\nVia: %s\r\nFrom: %s\r\nTo: %s;tag=Fg2Uy0r7geBQF\r\nContact: %s\r\n"+
