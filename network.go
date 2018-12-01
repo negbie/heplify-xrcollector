@@ -8,6 +8,8 @@ import (
 	"github.com/negbie/sipparser"
 )
 
+const maxPktSize = 4096
+
 func sendXR(conn *net.UDPConn, outXRCh chan XRPacket) {
 	for packet := range outXRCh {
 		n, err := conn.WriteToUDP(packet.data, packet.addr)
@@ -21,7 +23,7 @@ func sendXR(conn *net.UDPConn, outXRCh chan XRPacket) {
 
 func recvXR(conn *net.UDPConn, inXRCh chan XRPacket, outHEPCh chan []byte) {
 	for {
-		b := make([]byte, MAX_XR_PACKET_SIZE)
+		b := make([]byte, maxPktSize)
 		n, addr, err := conn.ReadFromUDP(b)
 		if err != nil {
 			log.Println("Error on XR read: ", err)

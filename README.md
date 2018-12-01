@@ -6,6 +6,8 @@ Download [heplify-xrcollector](https://github.com/negbie/heplify-xrcollector/rel
 
 ### Usage
 ```bash
+  -hi uint
+        HEP ID (default 3333)
   -hs string
         HEP UDP server address (default "127.0.0.1:9060")
   -xs string
@@ -19,5 +21,8 @@ Download [heplify-xrcollector](https://github.com/negbie/heplify-xrcollector/rel
 
 # Listen on 0.0.0.0:9066 for vq-rtcpxr and send it as HEP to 192.168.1.10:9060
 ./heplify-xrcollector -xs :9066 -hs 192.168.1.10:9060
+
+# Additionally change HEP ID to 1234
+./heplify-xrcollector -xs :9066 -hs 192.168.1.10:9060 -hi 1234
 
 ```

@@ -8,51 +8,46 @@ import (
 	"os"
 )
 
+// XRPacket holds UDP data and address
 type XRPacket struct {
 	addr *net.UDPAddr
 	data []byte
 }
 
-const MAX_XR_PACKET_SIZE = 4096
-const VERSION = "heplify-xrcollector 0.1"
-
-var (
-	hepServerAddress string
-	collectorAddress string
-)
-
 func init() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Use %s like: %s [option]\n", VERSION, os.Args[0])
+		fmt.Fprintf(os.Stderr, "Use %s like: %s [option]\n", "heplify-xrcollector 0.2", os.Args[0])
 		flag.PrintDefaults()
 	}
 
-	flag.StringVar(&hepServerAddress, "hs", "127.0.0.1:9060", "HEP UDP server address")
-	flag.StringVar(&collectorAddress, "xs", ":9064", "XR collector UDP listen address")
+	flag.StringVar(&cfg.HepServerAddress, "hs", "127.0.0.1:9060", "HEP UDP server address")
+	flag.StringVar(&cfg.CollectorAddress, "xs", ":9064", "XR collector UDP listen address")
+	flag.UintVar(&cfg.HepNodeID, "hi", 3333, "HEP ID")
 	flag.Parse()
 }
 
 func main() {
-	UDPAddr, err := net.ResolveUDPAddr("udp", collectorAddress)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	connXR, err := net.ListenUDP("udp", UDPAddr)
+	addrXR, err := net.ResolveUDPAddr("udp", cfg.CollectorAddress)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	connHEP, err := net.Dial("udp", hepServerAddress)
+	connXR, err := net.ListenUDP("udp", addrXR)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	connHEP, err := net.Dial("udp", cfg.HepServerAddress)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	inXRCh := make(chan XRPacket, 100)
 	outXRCh := make(chan XRPacket, 100)
 	outHEPCh := make(chan []byte, 100)
-	inXRCh := make(chan XRPacket, 100)
 
-	go sendXR(connXR, outXRCh)
 	go recvXR(connXR, inXRCh, outHEPCh)
+	go sendXR(connXR, outXRCh)
 	go sendHEP(connHEP, outHEPCh)
 
 	for packet := range inXRCh {

@@ -88,7 +88,7 @@ func makeHEPChuncks(payload []byte) []byte {
 	// Chunk capture agent ID
 	hepBuf.Write([]byte{0x00, 0x00, 0x00, 0x0c})
 	hepBuf.Write(hepLen10)
-	binary.BigEndian.PutUint32(chunck32, 2222)
+	binary.BigEndian.PutUint32(chunck32, uint32(cfg.HepNodeID))
 	hepBuf.Write(chunck32)
 
 	// Chunk captured packet payload
