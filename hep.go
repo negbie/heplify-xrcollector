@@ -19,14 +19,14 @@ var (
 	chunck32 = []byte{0x00, 0x00, 0x00, 0x00}
 )
 
-func encodeHEP(payload []byte) []byte {
-	hepMsg := append([]byte{}, makeHEPChuncks(payload)...)
+func encodeHEP(payload []byte, protoType byte) []byte {
+	hepMsg := append([]byte{}, makeHEPChuncks(payload, protoType)...)
 	binary.BigEndian.PutUint16(hepMsg[4:6], uint16(len(hepMsg)))
 	return hepMsg
 }
 
 // makeHEPChuncks will construct the respective HEP chunck
-func makeHEPChuncks(payload []byte) []byte {
+func makeHEPChuncks(payload []byte, protoType byte) []byte {
 	hepBuf.Reset()
 	hepBuf.Write(hepVer)
 	// hepMsg length placeholder. Will be written later
@@ -83,7 +83,7 @@ func makeHEPChuncks(payload []byte) []byte {
 	// Chunk protocol type (DNS, LOG, RTCP, SIP)
 	hepBuf.Write([]byte{0x00, 0x00, 0x00, 0x0b})
 	hepBuf.Write(hepLen7)
-	hepBuf.WriteByte(35)
+	hepBuf.WriteByte(protoType)
 
 	// Chunk capture agent ID
 	hepBuf.Write([]byte{0x00, 0x00, 0x00, 0x0c})

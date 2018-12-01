@@ -42,7 +42,7 @@ func recvXR(conn *net.UDPConn, inXRCh chan XRPacket, outHEPCh chan []byte) {
 
 func sendHEP(conn net.Conn, outHEPCh chan []byte) {
 	for packet := range outHEPCh {
-		_, err := conn.Write(encodeHEP(packet))
+		_, err := conn.Write(encodeHEP(packet, 35))
 		if err != nil {
 			log.Println("Error on HEP write: ", err)
 			continue

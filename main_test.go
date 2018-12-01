@@ -10,6 +10,16 @@ import (
 var (
 	listnXR = "127.0.0.1:9064"
 	addrHEP = "localhost:9060"
+	invite  = "INVITE sip:87.103.120.253:9070 SIP/2.0\r\n" +
+		"Via: SIP/2.0/UDP 10.0.3.13:3072;branch=z9hG4bK-2atcagwblzv2;rport\r\n" +
+		"From: <sip:5004@10.0.3.252>;tag=2ygtpy7bgk\r\n" +
+		"To: <sip:87.103.120.253:9070>\r\n" +
+		"Call-ID: 825962570309-8ds5sl3mca99\r\n" +
+		"CSeq: 1 INVITE\r\n" +
+		"Max-Forwards: 70\r\n" +
+		"Contact: <sip:5004@10.0.3.13:3072;line=swv8im3f>;reg-id=1\r\n" +
+		"User-Agent: snom821/873_19_20130321\r\n\r\n"
+
 	publish = "PUBLISH sip:87.103.120.253:9070 SIP/2.0\r\n" +
 		"Via: SIP/2.0/UDP 10.0.3.13:3072;branch=z9hG4bK-2atcagwblzv2;rport\r\n" +
 		"From: <sip:5004@10.0.3.252>;tag=2ygtpy7bgk\r\n" +
@@ -39,9 +49,9 @@ var (
 		"x-SIPmetrics:SVA=RG SRD=392 SFC=0\r\n" +
 		"x-SIPterm:SDC=OK SDT=7 SDR=OR\r\n" +
 		"JitterBuffer:JBA=3 JBR=2 JBN=20 JBM=20JBX=240\r\n" +
-		"PacketLoss:NLR=0.0 JDR=0.0\r\n" +
+		"PacketLoss:NLR=3.0 JDR=3.0\r\n" +
 		"BurstGapLoss:BLD=0.0 BD=0 GLD=0.0 GD=5930 GMIN=16\r\n" +
-		"Delay:RTD=0 ESD=0 IAJ=0\r\n" +
+		"Delay:RTD=0 ESD=0 IAJ=11\r\n" +
 		"QualityEst:MOSLQ=4.1 MOSCQ=4.1\r\n"
 )
 
@@ -74,7 +84,11 @@ func TestMain(t *testing.T) {
 	go sendXR(connXR, outXRCh)
 	go sendHEP(connHEP, outHEPCh)
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 10; i++ {
+		connHEP.Write(encodeHEP([]byte(invite), 1))
+	}
+
+	for i := 0; i < 10; i++ {
 		_, err := connXROut.Write([]byte(publish))
 		if err != nil {
 			log.Fatalln(err)
