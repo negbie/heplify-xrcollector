@@ -6,4 +6,5 @@ type config struct {
 	HepServerAddress string
 	CollectorAddress string
 	HepNodeID        uint
+	Debug            bool
 }

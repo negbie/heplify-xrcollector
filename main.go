@@ -16,13 +16,14 @@ type XRPacket struct {
 
 func init() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Use %s like: %s [option]\n", "heplify-xrcollector 0.2", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Use %s like: %s [option]\n", "heplify-xrcollector 0.3", os.Args[0])
 		flag.PrintDefaults()
 	}
 
 	flag.StringVar(&cfg.HepServerAddress, "hs", "127.0.0.1:9060", "HEP UDP server address")
 	flag.StringVar(&cfg.CollectorAddress, "xs", ":9064", "XR collector UDP listen address")
 	flag.UintVar(&cfg.HepNodeID, "hi", 3333, "HEP ID")
+	flag.BoolVar(&cfg.Debug, "debug", false, "Log with debug level")
 	flag.Parse()
 }
 

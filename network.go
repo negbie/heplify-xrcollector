@@ -10,17 +10,6 @@ import (
 
 const maxPktSize = 4096
 
-func sendXR(conn *net.UDPConn, outXRCh chan XRPacket) {
-	for packet := range outXRCh {
-		n, err := conn.WriteToUDP(packet.data, packet.addr)
-		if err != nil {
-			log.Println("Error on XR write: ", err)
-			continue
-		}
-		log.Printf("Sent following RTCP-XR PUBLISH packet with %d bytes:\n%s\n", n, string(packet.data))
-	}
-}
-
 func recvXR(conn *net.UDPConn, inXRCh chan XRPacket, outHEPCh chan []byte) {
 	for {
 		b := make([]byte, maxPktSize)
@@ -29,13 +18,32 @@ func recvXR(conn *net.UDPConn, inXRCh chan XRPacket, outHEPCh chan []byte) {
 			log.Println("Error on XR read: ", err)
 			continue
 		}
-		log.Printf("Received following RTCP-XR PUBLISH packet with %d bytes:\n%s\n", n, string(b[:n]))
-		if msg, err := processPublish(b[:n]); err == nil {
-			inXRCh <- XRPacket{addr, msg}
-			outHEPCh <- b[:n]
+		if cfg.Debug {
+			log.Printf("Received following RTCP-XR PUBLISH with %d bytes from %s:\n%s\n", n, addr, string(b[:n]))
 		} else {
+			log.Printf("Received RTCP-XR PUBLISH with %d bytes from %s\n", n, addr)
+		}
+		var msg []byte
+		if msg, err = processPublish(b[:n]); err != nil {
 			log.Println(err)
-			inXRCh <- XRPacket{addr, b[:n]}
+			continue
+		}
+		inXRCh <- XRPacket{addr, msg}
+		outHEPCh <- b[:n]
+	}
+}
+
+func sendXR(conn *net.UDPConn, outXRCh chan XRPacket) {
+	for packet := range outXRCh {
+		n, err := conn.WriteToUDP(packet.data, packet.addr)
+		if err != nil {
+			log.Println("Error on XR write: ", err)
+			continue
+		}
+		if cfg.Debug {
+			log.Printf("Sent following SIP/2.0 200 OK with %d bytes to %s:\n%s\n", n, packet.addr, string(packet.data))
+		} else {
+			log.Printf("Sent SIP/2.0 200 OK with %d bytes to %s\n", n, packet.addr)
 		}
 	}
 }
@@ -55,8 +63,8 @@ func processPublish(pkt []byte) ([]byte, error) {
 	if sip.Error != nil {
 		return nil, sip.Error
 	}
-	if sip.ContentType != "application/vq-rtcpxr" || len(sip.Body) < 32 {
-		return nil, fmt.Errorf("No vq-rtcpxr inside SIP PUBLISH:\n%s", sip.Msg)
+	if sip.CseqMethod != "PUBLISH" || sip.ContentType != "application/vq-rtcpxr" || len(sip.Body) < 32 {
+		return nil, fmt.Errorf("No or malformed vq-rtcpxr inside SIP PUBLISH:\n%s", sip.Msg)
 	}
 
 	resp := fmt.Sprintf("SIP/2.0 200 OK\r\nVia: %s\r\nFrom: %s\r\nTo: %s;tag=Fg2Uy0r7geBQF\r\nContact: %s\r\n"+

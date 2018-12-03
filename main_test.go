@@ -56,6 +56,7 @@ var (
 )
 
 func TestMain(t *testing.T) {
+	//cfg.Debug = true
 	addrXR, err := net.ResolveUDPAddr("udp", listnXR)
 	if err != nil {
 		log.Fatalln(err)
