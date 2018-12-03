@@ -18,10 +18,13 @@ func recvXR(conn *net.UDPConn, inXRCh chan XRPacket, outHEPCh chan []byte) {
 			log.Println("Error on XR read: ", err)
 			continue
 		}
+		if n >= maxPktSize {
+			log.Printf("Warning received packet from %s exceeds %d bytes\n", addr, maxPktSize)
+		}
 		if cfg.Debug {
 			log.Printf("Received following RTCP-XR PUBLISH with %d bytes from %s:\n%s\n", n, addr, string(b[:n]))
 		} else {
-			log.Printf("Received RTCP-XR PUBLISH with %d bytes from %s\n", n, addr)
+			log.Printf("Received packet with %d bytes from %s\n", n, addr)
 		}
 		var msg []byte
 		if msg, err = processPublish(b[:n]); err != nil {
@@ -43,7 +46,7 @@ func sendXR(conn *net.UDPConn, outXRCh chan XRPacket) {
 		if cfg.Debug {
 			log.Printf("Sent following SIP/2.0 200 OK with %d bytes to %s:\n%s\n", n, packet.addr, string(packet.data))
 		} else {
-			log.Printf("Sent SIP/2.0 200 OK with %d bytes to %s\n", n, packet.addr)
+			log.Printf("Sent back OK with %d bytes to %s\n", n, packet.addr)
 		}
 	}
 }
