@@ -66,7 +66,8 @@ func processPublish(pkt []byte) ([]byte, error) {
 	if sip.Error != nil {
 		return nil, sip.Error
 	}
-	if sip.CseqMethod != "PUBLISH" || sip.ContentType != "application/vq-rtcpxr" || len(sip.Body) < 32 {
+	if sip.CseqMethod != "PUBLISH" || sip.ContentType != "application/vq-rtcpxr" ||
+		len(sip.Body) < 32 || sip.From == nil || sip.To == nil || sip.Cseq == nil {
 		return nil, fmt.Errorf("No or malformed vq-rtcpxr inside SIP PUBLISH:\n%s", sip.Msg)
 	}
 
