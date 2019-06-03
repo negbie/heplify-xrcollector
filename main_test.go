@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	listnXR = "127.0.0.1:9064"
+	listnXR = "127.0.0.1:5060"
 	addrHEP = "localhost:9060"
 	invite  = "INVITE sip:87.103.120.253:9070 SIP/2.0\r\n" +
 		"Via: SIP/2.0/UDP 10.0.3.13:3072;branch=z9hG4bK-2atcagwblzv2;rport\r\n" +

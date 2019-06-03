@@ -22,12 +22,12 @@ func recvXR(conn *net.UDPConn, inXRCh chan XRPacket, outHEPCh chan []byte) {
 			log.Printf("Warning received packet from %s exceeds %d bytes\n", addr, maxPktSize)
 		}
 		if cfg.Debug {
-			log.Printf("Received following RTCP-XR PUBLISH with %d bytes from %s:\n%s\n", n, addr, string(b[:n]))
+			log.Printf("Received following RTCP-XR report with %d bytes from %s:\n%s\n", n, addr, string(b[:n]))
 		} else {
 			log.Printf("Received packet with %d bytes from %s\n", n, addr)
 		}
 		var msg []byte
-		if msg, err = processPublish(b[:n]); err != nil {
+		if msg, err = process(b[:n]); err != nil {
 			log.Println(err)
 			continue
 		}
@@ -61,14 +61,14 @@ func sendHEP(conn net.Conn, outHEPCh chan []byte) {
 	}
 }
 
-func processPublish(pkt []byte) ([]byte, error) {
+func process(pkt []byte) ([]byte, error) {
 	sip := sipparser.ParseMsg(string(pkt))
 	if sip.Error != nil {
 		return nil, sip.Error
 	}
-	if sip.CseqMethod != "PUBLISH" || sip.ContentType != "application/vq-rtcpxr" ||
-		len(sip.Body) < 32 || sip.From == nil || sip.To == nil || sip.Cseq == nil {
-		return nil, fmt.Errorf("No or malformed vq-rtcpxr inside SIP PUBLISH:\n%s", sip.Msg)
+	if sip.ContentType != "application/vq-rtcpxr" || len(sip.Body) < 32 ||
+		sip.From == nil || sip.To == nil || sip.Cseq == nil {
+		return nil, fmt.Errorf("No or malformed vq-rtcpxr inside SIP Message:\n%s", sip.Msg)
 	}
 
 	resp := fmt.Sprintf("SIP/2.0 200 OK\r\nVia: %s\r\nFrom: %s\r\nTo: %s;tag=Fg2Uy0r7geBQF\r\nContact: %s\r\n"+
